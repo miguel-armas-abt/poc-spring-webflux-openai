@@ -1,0 +1,25 @@
+server:
+  port: ${SERVER_PORT:8018}
+
+spring:
+  application:
+    name: ubigeo-v1
+
+configuration:
+  error-messages:
+    Default: No hemos podido realizar tu operación. Estamos trabajando para solucionar el inconveniente.
+
+  filePaths:
+    departments: ubigeo/departments.json
+
+  rest-clients:
+    openai-completion:
+      endpoint: https://api.openai.com/v1/chat/completions
+      headers:
+        forwarded:
+          channel-id: channel-id
+        provided:
+          Authorization: Bearer ${OPENAI_KEY}
+      performance:
+        timeout: ARTIFICIAL_INTELLIGENCE
+        concurrency: MEDIUM
