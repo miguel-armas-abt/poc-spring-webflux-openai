@@ -58,6 +58,19 @@ public class OpenAIRepository {
         .mapNotNull(HttpEntity::getBody));
   }
 
+  public Mono<ChatResponseWrapper> analyzeText(Map<String, String> headers,
+                                               String prompt) {
+    return webClient.post()
+        .uri(properties.searchEndpoint(SERVICE_NAME))
+        .headers(x -> fillHeaders(properties.searchHeaderTemplate(SERVICE_NAME), headers).accept(x))
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(BodyInserters.fromValue(openAIMapper.toAnalyzeTextRequest(300, 0.7, prompt)))
+        .retrieve()
+        .onStatus(HttpStatusCode::isError, this::handleError)
+        .toEntity(ChatResponseWrapper.class)
+        .mapNotNull(HttpEntity::getBody);
+  }
+
   private Mono<? extends Throwable> handleError(ClientResponse clientResponse) {
     return clientResponse.bodyToMono(String.class)
         .flatMap(jsonBody -> StringUtils.EMPTY.equals(jsonBody)

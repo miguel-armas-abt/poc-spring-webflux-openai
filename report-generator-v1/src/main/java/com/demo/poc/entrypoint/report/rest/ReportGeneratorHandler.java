@@ -2,16 +2,17 @@ package com.demo.poc.entrypoint.report.rest;
 
 import com.demo.poc.commons.core.validations.headers.DefaultHeaders;
 import com.demo.poc.commons.core.validations.headers.HeaderValidator;
-import com.demo.poc.entrypoint.report.repository.openai.OpenAIRepository;
-import com.demo.poc.commons.core.restserver.ServerResponseBuilder;
+import com.demo.poc.entrypoint.report.enums.AreaType;
 
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 
+import com.demo.poc.entrypoint.report.service.ReportGeneratorService;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DefaultDataBufferFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -23,29 +24,24 @@ import static com.demo.poc.commons.core.restclient.utils.HttpHeadersFiller.extra
 @RequiredArgsConstructor
 public class ReportGeneratorHandler {
 
-  private final OpenAIRepository openAIRepository;
   private final HeaderValidator headerValidator;
+  private final ReportGeneratorService reportGeneratorService;
 
   public Mono<ServerResponse> generateReport(ServerRequest serverRequest) {
     Map<String, String> headers = extractHeadersAsMap(serverRequest);
     headerValidator.validate(headers, DefaultHeaders.class);
 
-    // recover image from ServerRequest here!
-    FilePart filePart = null;
-
-    // the prompt is write here
-    String prompt = "Analiza la siguiente imagen e indicame que puedes ver";
-
     return serverRequest.multipartData()
         .flatMap(parts -> {
-          FilePart imageFile = (FilePart) parts.toSingleValueMap().get("image");
-
-          if (Objects.isNull(imageFile)) {
-            return ServerResponse.badRequest().bodyValue("Missing 'image' part");
-          }
-
-          return openAIRepository.analyzeImage(headers, prompt, imageFile)
-              .flatMap(response -> ServerResponseBuilder.buildMono(ServerResponse.ok(), serverRequest.headers(), response));
+          AreaType.validate(parts.toSingleValueMap());
+          return reportGeneratorService.generateReport(headers, parts.toSingleValueMap());
+        })
+        .flatMap(bytes -> {
+          DataBuffer buffer = new DefaultDataBufferFactory().wrap(bytes);
+          return ServerResponse.ok()
+              .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=psicologia.docx")
+              .contentType(MediaType.valueOf("application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+              .bodyValue(buffer);
         });
   }
 }

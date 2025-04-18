@@ -11,7 +11,7 @@ public enum TimeoutLevel {
   GOOD(1500, 200, 2000),
   POOR(2000, 200, 4000),
   BAD(2500, 200, 8000),
-  ARTIFICIAL_INTELLIGENCE(25000, 200, 25000);
+  ARTIFICIAL_INTELLIGENCE(35000, 10000, 35000);
 
   private final long connectionTimeoutInMillis;
   private final long writeTimeoutInMillis;
