@@ -1,5 +1,7 @@
 package com.demo.poc.entrypoint.report.service;
 
+import com.demo.poc.commons.custom.constants.FileConstants;
+import com.demo.poc.commons.custom.properties.ApplicationProperties;
 import com.demo.poc.entrypoint.report.dto.aggregate.ReportAggregate;
 import com.demo.poc.entrypoint.report.enums.AreaType;
 import com.demo.poc.entrypoint.report.enums.ConclusionType;
@@ -22,6 +24,7 @@ public class ReportGeneratorServiceImpl implements ReportGeneratorService {
   private final List<AreaTypeReporter> areaTypeReporters;
   private final List<ConclusionReporter> conclusionTypeReporters;
   private final DocxGeneratorHelper docxGenerator;
+  private final ApplicationProperties properties;
 
   @Override
   public Mono<byte[]> generateReport(Map<String, String> headers, Map<String, Part> images) {
@@ -54,11 +57,11 @@ public class ReportGeneratorServiceImpl implements ReportGeneratorService {
               AreaType.CONDUCT_AREA.name(), reportAggregate.getConductAreaReport(),
               AreaType.EMOTIONAL_AREA.name(), reportAggregate.getEmotionalAreaReport(),
               AreaType.SOCIAL_AREA.name(), reportAggregate.getSocialAreaReport(),
-              ConclusionType.OBSERVATIONS.name(), "\n" + reportAggregate.getObservationReport(),
-              ConclusionType.SUGGESTIONS.name(), "\n" + reportAggregate.getSuggestionReport()
+              ConclusionType.OBSERVATIONS.name(), "\n" + reportAggregate.getObservationReport() + "\n",
+              ConclusionType.SUGGESTIONS.name(), "\n" + reportAggregate.getSuggestionReport() + "\n"
           );
 
-          return docxGenerator.generateReport("/templates/template.docx", data);
+          return docxGenerator.generateReport(properties.getFilePaths().get(FileConstants.DOCX_TEMPLATE_FILE_PROPERTY), data);
         });
   }
 }

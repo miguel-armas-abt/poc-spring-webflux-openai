@@ -1,6 +1,8 @@
 package com.demo.poc.entrypoint.report.reporter.area;
 
 import com.demo.poc.commons.core.serialization.JsonSerializer;
+import com.demo.poc.commons.custom.constants.FileConstants;
+import com.demo.poc.commons.custom.properties.ApplicationProperties;
 import com.demo.poc.entrypoint.report.dto.aggregate.ReportAggregate;
 import com.demo.poc.entrypoint.report.dto.prompt.Prompt;
 import com.demo.poc.entrypoint.report.enums.AreaType;
@@ -18,10 +20,11 @@ public class ConductAreaReporter implements AreaTypeReporter {
 
   private final JsonSerializer jsonSerializer;
   private final OpenAIRepository openAIRepository;
+  private final ApplicationProperties properties;
 
   @Override
   public Mono<String> generateReport(Map<String, String> headers, FilePart image, ReportAggregate aggregate) {
-    return jsonSerializer.readListFromFile("prompts/prompts.json", Prompt.class)
+    return jsonSerializer.readListFromFile(properties.getFilePaths().get(FileConstants.PROMPTS_FILE_PROPERTY), Prompt.class)
         .filter(prompt -> AreaType.CONDUCT_AREA.getLabel().equals(prompt.getLabel()))
         .single()
         .flatMap(prompt -> openAIRepository.analyzeImage(headers, prompt.buildPrompt(), image))

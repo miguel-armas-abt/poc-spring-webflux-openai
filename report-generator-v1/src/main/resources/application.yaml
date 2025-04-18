@@ -10,7 +10,8 @@ configuration:
     Default: No hemos podido realizar tu operación. Estamos trabajando para solucionar el inconveniente.
 
   filePaths:
-    departments: ubigeo/departments.json
+    prompts: prompts/prompts.json
+    docx-template: /templates/template.docx
 
   rest-clients:
     openai-completion:
@@ -23,3 +24,6 @@ configuration:
       performance:
         timeout: ARTIFICIAL_INTELLIGENCE
         concurrency: MEDIUM
+      configuration:
+        max-tokens: 200 # response length
+        temperature: 0.7 # creativity

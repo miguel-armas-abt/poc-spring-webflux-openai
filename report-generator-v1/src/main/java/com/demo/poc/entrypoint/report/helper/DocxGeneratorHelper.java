@@ -72,7 +72,16 @@ public class DocxGeneratorHelper {
       paragraph.removeRun(i);
     }
 
-    XWPFRun newRun = paragraph.createRun();
-    newRun.setText(replacedText);
+    String[] lines = replacedText.split("\n");
+    for (int i = 0; i < lines.length; i++) {
+      String line = lines[i].trim();
+
+      XWPFRun run = paragraph.createRun();
+      run.setText(line);
+
+      if (i < lines.length - 1) {
+        run.addBreak();
+      }
+    }
   }
 }
