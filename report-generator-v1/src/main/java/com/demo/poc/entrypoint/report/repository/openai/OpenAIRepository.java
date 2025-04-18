@@ -46,7 +46,7 @@ public class OpenAIRepository {
                                                 String prompt,
                                                 FilePart imageFile) {
     return ImageSerializer.serializeImageAndGetBase64(imageFile)
-        .map(imageInBase64 -> openAIMapper.toGpt4VisionPreviewRequest(300, 0.7, prompt, imageInBase64))
+        .map(imageInBase64 -> openAIMapper.toAnalyzeImageRequest(300, 0.7, prompt, imageInBase64))
         .flatMap(request -> webClient.post()
         .uri(properties.searchEndpoint(SERVICE_NAME))
         .headers(x -> fillHeaders(properties.searchHeaderTemplate(SERVICE_NAME), headers).accept(x))

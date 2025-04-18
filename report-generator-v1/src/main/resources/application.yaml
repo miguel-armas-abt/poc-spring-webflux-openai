@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: ubigeo-v1
+    name: report-generator-v1
 
 configuration:
   error-messages:

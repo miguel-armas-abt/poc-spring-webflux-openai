@@ -14,16 +14,16 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface OpenAIRequestMapper {
 
-  default ChatRequestWrapper toGpt4VisionPreviewRequest(Integer maxTokens, Double temperature, String prompt, String imageInBase64) {
+  default ChatRequestWrapper toAnalyzeImageRequest(Integer maxTokens, Double temperature, String prompt, String imageInBase64) {
     return ChatRequestWrapper.builder()
         .model(ModelType.GPT_4_1_MINI.getLabel())
         .maxTokens(maxTokens)
         .temperature(temperature)
-        .messages(buildGpt4VisionPreviewMessage(prompt, imageInBase64))
+        .messages(buildAnalyzeImageMessage(prompt, imageInBase64))
         .build();
   }
 
-  private List<MessageRequest> buildGpt4VisionPreviewMessage(String prompt, String imageInBase64) {
+  private List<MessageRequest> buildAnalyzeImageMessage(String prompt, String imageInBase64) {
     return List.of(
         MessageRequest.builder()
             .role(RoleType.USER.getLabel())
