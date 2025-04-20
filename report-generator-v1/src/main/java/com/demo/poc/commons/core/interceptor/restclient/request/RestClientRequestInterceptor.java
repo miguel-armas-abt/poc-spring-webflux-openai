@@ -8,7 +8,6 @@ import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.client.reactive.ClientHttpRequest;
 import org.springframework.http.client.reactive.ClientHttpRequestDecorator;
-import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -21,7 +20,6 @@ import java.nio.charset.StandardCharsets;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class RestClientRequestInterceptor implements ExchangeFilterFunction {
 

@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
@@ -17,7 +16,6 @@ import java.util.Map;
 
 import static com.demo.poc.commons.core.tracing.enums.TraceParamType.TRACE_ID;
 
-@Component
 @Slf4j
 @RequiredArgsConstructor
 public class RestClientResponseInterceptor implements ExchangeFilterFunction {

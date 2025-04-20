@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.ThreadContext;
 
-import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.server.ServerWebExchange;
 
@@ -26,7 +25,6 @@ import static com.demo.poc.commons.core.logging.enums.LoggingType.REST_SERVER_RE
 import static com.demo.poc.commons.core.tracing.utils.TraceHeaderExtractor.extractTraceHeadersAsMap;
 
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class ThreadContextInjector {
 
