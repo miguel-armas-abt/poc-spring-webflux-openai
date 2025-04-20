@@ -32,7 +32,7 @@ public enum ErrorDictionary {
 
   //custom=01
   ERROR_READING_DOCX("10.01.01", "Error reading DOCX", INTERNAL_SERVER_ERROR, DocxReadException.class),
-  INVALID_COGNITIVE_AREA_FIELD("10.01.02", "Cognitive area image is required", BAD_REQUEST, AreaTypeImageIsRequiredException.class),
+  FORM_IMAGE_IS_REQUIRED("10.01.02", "Form image is required", BAD_REQUEST, FormImageIsRequiredException.class),
   NO_SUCH_AREA_TYPE_REPORTER("10.01.03", "No such area type reporter", BAD_REQUEST, NoSuchAreaTypeReporterException.class),
   NO_SUCH_CONCLUSION_TYPE_REPORTER("10.01.04", "No such conclusion type reporter", BAD_REQUEST, NoSuchConclusionTypeReporterException.class),;
 

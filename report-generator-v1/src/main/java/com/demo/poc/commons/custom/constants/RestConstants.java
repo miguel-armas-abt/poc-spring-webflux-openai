@@ -7,4 +7,6 @@ import lombok.NoArgsConstructor;
 public class RestConstants {
 
   public static final String BASE_URI = "/poc/report-generator/v1";
+
+  public static final String FORM_IMAGE_PARAM = "form-image";
 }

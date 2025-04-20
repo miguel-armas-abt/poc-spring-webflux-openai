@@ -1,67 +1,44 @@
 package com.demo.poc.entrypoint.report.service;
 
-import com.demo.poc.commons.custom.constants.FileConstants;
+import com.demo.poc.commons.core.serialization.JsonSerializer;
 import com.demo.poc.commons.custom.properties.ApplicationProperties;
-import com.demo.poc.entrypoint.report.dto.aggregate.ReportAggregate;
-import com.demo.poc.entrypoint.report.enums.AreaType;
-import com.demo.poc.entrypoint.report.enums.ConclusionType;
+import com.demo.poc.entrypoint.report.dto.aggregate.ReportDto;
+import com.demo.poc.entrypoint.report.dto.prompt.Prompt;
 import com.demo.poc.entrypoint.report.helper.DocxGeneratorHelper;
-import com.demo.poc.entrypoint.report.reporter.area.AreaTypeReporter;
-import com.demo.poc.entrypoint.report.reporter.conclusion.ConclusionReporter;
+import com.demo.poc.entrypoint.report.repository.openai.OpenAIRepository;
+import com.demo.poc.entrypoint.report.utils.ReportUtils;
+import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.codec.multipart.FilePart;
-import org.springframework.http.codec.multipart.Part;
 import org.springframework.stereotype.Service;
+
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class ReportGeneratorServiceImpl implements ReportGeneratorService {
 
-  private final List<AreaTypeReporter> areaTypeReporters;
-  private final List<ConclusionReporter> conclusionTypeReporters;
+  private static final String TEMPLATE_FILE = "docx-template";
+  private static final String PROMPT_FILE = "prompt";
+
+  private final JsonSerializer jsonSerializer;
+  private final OpenAIRepository openAIRepository;
   private final DocxGeneratorHelper docxGenerator;
   private final ApplicationProperties properties;
+  private final Gson gson;
 
   @Override
-  public Mono<byte[]> generateReport(Map<String, String> headers, Map<String, Part> images) {
-    ReportAggregate aggregate = new ReportAggregate();
-    return Mono.when(
-        AreaTypeReporter.selectReporter(areaTypeReporters, AreaType.COGNITIVE_AREA)
-            .generateReport(headers, (FilePart) images.get(AreaType.COGNITIVE_AREA.getLabel()), aggregate),
+  public Mono<byte[]> generateReport(Map<String, String> headers, FilePart formImage) {
+    Map<String, String> files = properties.getFilePaths();
+    String promptFilePath = files.get(PROMPT_FILE);
+    String templateFilePath = files.get(TEMPLATE_FILE);
 
-        AreaTypeReporter.selectReporter(areaTypeReporters, AreaType.CONDUCT_AREA)
-            .generateReport(headers, (FilePart) images.get(AreaType.CONDUCT_AREA.getLabel()), aggregate),
-
-        AreaTypeReporter.selectReporter(areaTypeReporters, AreaType.EMOTIONAL_AREA)
-            .generateReport(headers, (FilePart) images.get(AreaType.EMOTIONAL_AREA.getLabel()), aggregate),
-
-        AreaTypeReporter.selectReporter(areaTypeReporters, AreaType.SOCIAL_AREA)
-            .generateReport(headers, (FilePart) images.get(AreaType.SOCIAL_AREA.getLabel()), aggregate)
-    )
-        .thenReturn(aggregate)
-        .flatMap(currentAggregate -> Mono.when(
-            ConclusionReporter.selectReporter(conclusionTypeReporters, ConclusionType.OBSERVATIONS)
-                .generateReport(headers, aggregate),
-
-            ConclusionReporter.selectReporter(conclusionTypeReporters, ConclusionType.SUGGESTIONS)
-                .generateReport(headers, aggregate)
-        ))
-        .thenReturn(aggregate)
-        .flatMap(reportAggregate -> {
-          Map<String, String> data = Map.of(
-              AreaType.COGNITIVE_AREA.name(), reportAggregate.getCognitiveAreaReport(),
-              AreaType.CONDUCT_AREA.name(), reportAggregate.getConductAreaReport(),
-              AreaType.EMOTIONAL_AREA.name(), reportAggregate.getEmotionalAreaReport(),
-              AreaType.SOCIAL_AREA.name(), reportAggregate.getSocialAreaReport(),
-              ConclusionType.OBSERVATIONS.name(), "\n" + reportAggregate.getObservationReport() + "\n",
-              ConclusionType.SUGGESTIONS.name(), "\n" + reportAggregate.getSuggestionReport() + "\n"
-          );
-
-          return docxGenerator.generateReport(properties.getFilePaths().get(FileConstants.DOCX_TEMPLATE_FILE_PROPERTY), data);
-        });
+    return jsonSerializer.readElementFromFile(promptFilePath, Prompt.class)
+        .flatMap(prompt -> openAIRepository.analyzeImage(headers, prompt.buildPrompt(), formImage))
+        .map(response -> response.getChoices().get(0).getMessage().getContent())
+        .map(response -> gson.fromJson(ReportUtils.cleanResponse.apply(response), ReportDto.class))
+        .flatMap(report -> docxGenerator.generateReport(templateFilePath, ReportUtils.mapReportData.apply(report)));
   }
 }

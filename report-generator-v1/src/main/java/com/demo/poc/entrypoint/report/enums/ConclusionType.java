@@ -7,8 +7,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ConclusionType {
 
-  OBSERVATIONS("observations"),
-  SUGGESTIONS("suggestions"),;
-
-  private final String label;
+  OBSERVATIONS,
+  SUGGESTIONS;
 }

@@ -17,11 +17,12 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Prompt {
 
-  private String label;
-  private String prompt;
+  private List<String> messages;
   private List<String> examples;
 
   public String buildPrompt() {
-    return this.getPrompt() + "\n" + "Ejemplos: \n" + String.join("; ", this.getExamples());
+    return String.join(" ", this.messages)
+        + "\nPor ejemplo: "
+        + "\n" + String.join(" ", this.examples);
   }
 }

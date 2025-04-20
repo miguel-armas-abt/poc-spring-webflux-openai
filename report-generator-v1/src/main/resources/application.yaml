@@ -10,7 +10,7 @@ configuration:
     Default: No hemos podido realizar tu operación. Estamos trabajando para solucionar el inconveniente.
 
   filePaths:
-    prompts: prompts/prompts.json
+    prompt: prompts/Prompt.json
     docx-template: /templates/template.docx
 
   rest-clients:
@@ -25,5 +25,5 @@ configuration:
         timeout: ARTIFICIAL_INTELLIGENCE
         concurrency: MEDIUM
       configuration:
-        max-tokens: 200 # response length
+        max-tokens: 700 # response length
         temperature: 0.7 # creativity
