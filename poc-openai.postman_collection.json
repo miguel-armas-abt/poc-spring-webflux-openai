@@ -1,24 +1,24 @@
 {
 	"info": {
-		"_postman_id": "d0e31824-61a1-4a86-ae74-1bed6addc2fb",
-		"name": "poc-openai",
+		"_postman_id": "1332ea51-f308-41f6-a4f2-0c499aa3fa19",
+		"name": "report-generator",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "13773998"
+		"_exporter_id": "33527392"
 	},
 	"item": [
 		{
-			"name": "reports",
+			"name": "generate-report",
 			"request": {
 				"method": "POST",
 				"header": [
 					{
-						"key": "channel-id",
-						"value": "WEB",
+						"key": "trace-id",
+						"value": "abcd-123",
 						"type": "text"
 					},
 					{
-						"key": "trace-id",
-						"value": "abcd-123",
+						"key": "channel-id",
+						"value": "WEB",
 						"type": "text"
 					}
 				],
@@ -26,24 +26,9 @@
 					"mode": "formdata",
 					"formdata": [
 						{
-							"key": "cognitive-area",
+							"key": "form-image",
 							"type": "file",
-							"src": "/C:/Users/User/Downloads/cognitive-area.jpg"
-						},
-						{
-							"key": "conduct-area",
-							"type": "file",
-							"src": "/C:/Users/User/Downloads/conductual-area.jpg"
-						},
-						{
-							"key": "emotional-area",
-							"type": "file",
-							"src": "/C:/Users/User/Downloads/emotional-area.jpg"
-						},
-						{
-							"key": "social-area",
-							"type": "file",
-							"src": "/C:/Users/User/Downloads/social-area.jpg"
+							"src": "/D:/dev-workspace/_personal/poc-webflux-openai/report-generator-v1/src/main/resources/img/form-image.jpg"
 						}
 					]
 				},
