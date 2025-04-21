@@ -1,8 +1,8 @@
 package com.demo.poc.commons.core.restclient;
 
 import com.demo.poc.commons.core.errors.exceptions.UnexpectedSslException;
+import com.demo.poc.commons.core.properties.restclient.PerformanceTemplate;
 import com.demo.poc.commons.core.restclient.enums.ConcurrencyLevel;
-import com.demo.poc.commons.custom.properties.restclient.PerformanceTemplate;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;

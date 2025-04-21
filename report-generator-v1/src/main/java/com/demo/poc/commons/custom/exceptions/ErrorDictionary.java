@@ -22,19 +22,19 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 public enum ErrorDictionary {
 
   //system=00
-  INVALID_FIELD("10.00.01", "Invalid field", BAD_REQUEST, InvalidFieldException.class),
-  NO_SUCH_REST_CLIENT("10.00.02", "No such rest client", INTERNAL_SERVER_ERROR, NoSuchRestClientException.class),
-  ERROR_READING_JSON("10.00.03", "Error reading JSON", INTERNAL_SERVER_ERROR, JsonReadException.class),
-  ERROR_MAPPING_REFLECTIVE_PARAMS("10.00.04", "Error mapping reflective params", INTERNAL_SERVER_ERROR, ReflectiveParamMappingException.class),
-  ERROR_ASSIGN_REFLECTIVE_PARAMS("10.00.05", "Error assign reflective params", INTERNAL_SERVER_ERROR, ReflectiveParamAssignmentException.class),
-  INVALID_STREAMING_DATA("10.00.06", "Streaming data is not processable", INTERNAL_SERVER_ERROR, InvalidStreamingData.class),
-  UNEXPECTED_SSL_EXCEPTION("10.00.07", "Unexpected SSL error for HTTP client", INTERNAL_SERVER_ERROR, UnexpectedSslException.class),
+  INVALID_FIELD("01.00.01", "Invalid field", BAD_REQUEST, InvalidFieldException.class),
+  NO_SUCH_REST_CLIENT("01.00.02", "No such rest client", INTERNAL_SERVER_ERROR, NoSuchRestClientException.class),
+  ERROR_READING_JSON("01.00.03", "Error reading JSON", INTERNAL_SERVER_ERROR, JsonReadException.class),
+  ERROR_MAPPING_REFLECTIVE_PARAMS("01.00.04", "Error mapping reflective params", INTERNAL_SERVER_ERROR, ReflectiveParamMappingException.class),
+  ERROR_ASSIGN_REFLECTIVE_PARAMS("01.00.05", "Error assign reflective params", INTERNAL_SERVER_ERROR, ReflectiveParamAssignmentException.class),
+  INVALID_STREAMING_DATA("01.00.06", "Streaming data is not processable", INTERNAL_SERVER_ERROR, InvalidStreamingData.class),
+  UNEXPECTED_SSL_EXCEPTION("01.00.07", "Unexpected SSL error for HTTP client", INTERNAL_SERVER_ERROR, UnexpectedSslException.class),
 
   //custom=01
-  ERROR_READING_DOCX("10.01.01", "Error reading DOCX", INTERNAL_SERVER_ERROR, DocxReadException.class),
-  FORM_IMAGE_IS_REQUIRED("10.01.02", "Form image is required", BAD_REQUEST, FormImageIsRequiredException.class),
-  NO_SUCH_AREA_TYPE_REPORTER("10.01.03", "No such area type reporter", BAD_REQUEST, NoSuchAreaTypeReporterException.class),
-  NO_SUCH_CONCLUSION_TYPE_REPORTER("10.01.04", "No such conclusion type reporter", BAD_REQUEST, NoSuchConclusionTypeReporterException.class),;
+  ERROR_READING_DOCX("01.01.01", "Error reading DOCX", INTERNAL_SERVER_ERROR, DocxReadException.class),
+  FORM_IMAGE_IS_REQUIRED("01.01.02", "Form image is required", BAD_REQUEST, FormImageIsRequiredException.class),
+  NO_SUCH_AREA_TYPE_REPORTER("01.01.03", "No such area type reporter", BAD_REQUEST, NoSuchAreaTypeReporterException.class),
+  NO_SUCH_CONCLUSION_TYPE_REPORTER("01.01.04", "No such conclusion type reporter", BAD_REQUEST, NoSuchConclusionTypeReporterException.class),;
 
   private final String code;
   private final String message;

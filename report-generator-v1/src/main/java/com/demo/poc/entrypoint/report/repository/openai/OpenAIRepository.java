@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.demo.poc.commons.core.errors.dto.ErrorDto;
 import com.demo.poc.commons.core.errors.exceptions.RestClientException;
+import com.demo.poc.commons.core.properties.restclient.RestClient;
 import com.demo.poc.commons.core.restclient.WebClientFactory;
 import com.demo.poc.commons.custom.properties.ApplicationProperties;
 import com.demo.poc.entrypoint.report.repository.openai.config.OpenAIProperties;
@@ -38,10 +39,12 @@ public class OpenAIRepository {
   private final OpenAIRequestMapper openAIMapper;
 
   private WebClient webClient;
+  private RestClient restClient;
 
   @PostConstruct
   public void init() {
-    this.webClient = webClientFactory.createWebClient(appProperties.searchPerformance(SERVICE_NAME), SERVICE_NAME);
+    this.restClient = appProperties.searchRestClient(SERVICE_NAME);
+    this.webClient = webClientFactory.createWebClient(this.restClient.getPerformance(), SERVICE_NAME);
   }
 
   public Mono<ChatResponseWrapper> analyzeImage(Map<String, String> headers,
@@ -50,8 +53,8 @@ public class OpenAIRepository {
     return ImageSerializer.serializeImageAndGetBase64(imageFile)
         .map(imageInBase64 -> openAIMapper.toAnalyzeImageRequest(openAIProperties.getMaxTokens(), openAIProperties.getTemperature(), prompt, imageInBase64))
         .flatMap(request -> webClient.post()
-        .uri(appProperties.searchEndpoint(SERVICE_NAME))
-        .headers(x -> fillHeaders(appProperties.searchHeaderTemplate(SERVICE_NAME), headers).accept(x))
+        .uri(this.restClient.getRequest().getEndpoint())
+        .headers(x -> fillHeaders(this.restClient.getRequest().getHeaders(), headers).accept(x))
         .contentType(MediaType.APPLICATION_JSON)
         .body(BodyInserters.fromValue(request))
         .retrieve()
@@ -63,8 +66,8 @@ public class OpenAIRepository {
   public Mono<ChatResponseWrapper> analyzeText(Map<String, String> headers,
                                                String prompt) {
     return webClient.post()
-        .uri(appProperties.searchEndpoint(SERVICE_NAME))
-        .headers(x -> fillHeaders(appProperties.searchHeaderTemplate(SERVICE_NAME), headers).accept(x))
+        .uri(this.restClient.getRequest().getEndpoint())
+        .headers(x -> fillHeaders(this.restClient.getRequest().getHeaders(), headers).accept(x))
         .contentType(MediaType.APPLICATION_JSON)
         .body(BodyInserters.fromValue(openAIMapper.toAnalyzeTextRequest(openAIProperties.getMaxTokens(), openAIProperties.getTemperature(), prompt)))
         .retrieve()

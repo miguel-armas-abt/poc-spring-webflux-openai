@@ -15,12 +15,11 @@ configuration:
 
   rest-clients:
     openai-completion:
-      endpoint: https://api.openai.com/v1/chat/completions
-      headers:
-        forwarded:
-          channel-id: channel-id
-        provided:
-          Authorization: Bearer ${OPENAI_KEY}
+      request:
+        endpoint: https://api.openai.com/v1/chat/completions
+        headers:
+          provided:
+            Authorization: Bearer ${OPENAI_KEY}
       performance:
         timeout: FATAL
         concurrency: MEDIUM

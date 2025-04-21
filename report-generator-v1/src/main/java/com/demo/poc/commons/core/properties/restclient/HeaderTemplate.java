@@ -1,4 +1,4 @@
-package com.demo.poc.commons.custom.properties.restclient;
+package com.demo.poc.commons.core.properties.restclient;
 
 import java.util.Map;
 
