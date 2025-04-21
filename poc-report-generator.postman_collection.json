@@ -12,13 +12,18 @@
 				"method": "POST",
 				"header": [
 					{
+						"key": "timestamp",
+						"value": "{{$isoTimestamp}}",
+						"type": "text"
+					},
+					{
 						"key": "trace-id",
-						"value": "abcd-123",
+						"value": "{{$guid}}",
 						"type": "text"
 					},
 					{
 						"key": "channel-id",
-						"value": "WEB",
+						"value": "APP",
 						"type": "text"
 					}
 				],
