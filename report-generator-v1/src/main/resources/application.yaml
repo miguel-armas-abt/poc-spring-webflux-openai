@@ -22,7 +22,7 @@ configuration:
         provided:
           Authorization: Bearer ${OPENAI_KEY}
       performance:
-        timeout: ARTIFICIAL_INTELLIGENCE
+        timeout: FATAL
         concurrency: MEDIUM
       configuration:
         max-tokens: 700 # response length
