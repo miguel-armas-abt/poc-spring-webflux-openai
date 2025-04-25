@@ -1,7 +1,8 @@
 package com.demo.poc.entrypoint.report.rest;
 
+import com.demo.poc.commons.core.restserver.utils.RestServerUtils;
 import com.demo.poc.commons.core.validations.headers.DefaultHeaders;
-import com.demo.poc.commons.core.validations.headers.HeaderValidator;
+import com.demo.poc.commons.core.validations.ParamValidator;
 import com.demo.poc.commons.custom.constants.RestConstants;
 import com.demo.poc.commons.custom.exceptions.FormImageIsRequiredException;
 
@@ -17,26 +18,23 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Component;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
-
-import static com.demo.poc.commons.core.restclient.utils.HttpHeadersFiller.extractHeadersAsMap;
 
 @Component
 @RequiredArgsConstructor
 public class ReportGeneratorHandler {
 
-  private final HeaderValidator headerValidator;
+  private final ParamValidator paramValidator;
   private final ReportGeneratorService reportGeneratorService;
 
   public Mono<ServerResponse> generateReport(ServerRequest serverRequest) {
-    Map<String, String> headers = extractHeadersAsMap(serverRequest);
-    headerValidator.validate(headers, DefaultHeaders.class);
+    Map<String, String> headers = RestServerUtils.extractHeadersAsMap(serverRequest);
 
-    return serverRequest.multipartData()
-        .map(MultiValueMap::toSingleValueMap)
+    return paramValidator.validateAndGet(headers, DefaultHeaders.class)
+        .zipWith(serverRequest.multipartData())
+        .flatMap(tuple -> Mono.just(tuple.getT2().toSingleValueMap()))
         .filter(parts -> Objects.nonNull(parts.get(RestConstants.FORM_IMAGE_PARAM)))
         .switchIfEmpty(Mono.error(FormImageIsRequiredException::new))
         .map(parts -> (FilePart) parts.get(RestConstants.FORM_IMAGE_PARAM))
