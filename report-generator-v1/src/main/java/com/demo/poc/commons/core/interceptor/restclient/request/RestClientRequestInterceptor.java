@@ -1,6 +1,7 @@
 package com.demo.poc.commons.core.interceptor.restclient.request;
 
-import com.demo.poc.commons.core.logging.ThreadContextInjector;
+import com.demo.poc.commons.core.logging.ThreadContextRestClientInjector;
+import com.demo.poc.commons.core.logging.dto.RestRequestLog;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
@@ -23,7 +24,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 @RequiredArgsConstructor
 public class RestClientRequestInterceptor implements ExchangeFilterFunction {
 
-  private final ThreadContextInjector threadContextInjector;
+  private final ThreadContextRestClientInjector restClientContext;
 
   @Override
   public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
@@ -44,8 +45,8 @@ public class RestClientRequestInterceptor implements ExchangeFilterFunction {
                   .join(body)
                   .flatMap(buffer -> {
 
-                    var requestBody = buffer.toString(StandardCharsets.UTF_8);
-                    generateTraceIfLoggerIsPresent(clientRequest, requestBody);
+                    String requestBody = buffer.toString(StandardCharsets.UTF_8);
+                    generateTrace(clientRequest, requestBody);
 
                     // buffer release
                     DataBuffer replicaBuffer = buffer.factory().wrap(buffer.asByteBuffer());
@@ -56,7 +57,7 @@ public class RestClientRequestInterceptor implements ExchangeFilterFunction {
 
             @Override
             public Mono<Void> setComplete() {
-              generateTraceIfLoggerIsPresent(clientRequest, EMPTY);
+              generateTrace(clientRequest, EMPTY);
               return super.setComplete();
             }
 
@@ -66,19 +67,14 @@ public class RestClientRequestInterceptor implements ExchangeFilterFunction {
         .build();
   }
 
-  private void generateTraceIfLoggerIsPresent(ClientRequest clientRequest, String requestBody) {
-      generateTrace(clientRequest, requestBody);
-  }
-
   private void generateTrace(ClientRequest clientRequest, String requestBody) {
-    try {
-      threadContextInjector.populateFromRestClientRequest(
-          clientRequest.method().toString(),
-          clientRequest.url().toString(),
-          clientRequest.headers().toSingleValueMap(),
-          requestBody);
-    } catch (Exception ex) {
-      log.error("Error reading request body: {}", ex.getClass(), ex);
-    }
+    RestRequestLog log = RestRequestLog.builder()
+        .method(clientRequest.method().toString())
+        .uri(clientRequest.url().toString())
+        .requestHeaders(clientRequest.headers().toSingleValueMap())
+        .requestBody(requestBody)
+        .build();
+
+    restClientContext.populateRequest(log);
   }
 }

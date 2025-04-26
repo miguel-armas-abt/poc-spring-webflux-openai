@@ -20,6 +20,12 @@ configuration:
         headers:
           provided:
             Authorization: Bearer ${OPENAI_KEY}
+          forwarded:
+            channelId: channelId
+          auto-generated:
+            timestamp: TIMESTAMP
+          trace:
+            traceParent: TRACE_PARENT
       performance:
         timeout: FATAL
         concurrency: MEDIUM

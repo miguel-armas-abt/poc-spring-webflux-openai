@@ -3,7 +3,7 @@ package com.demo.poc.commons.core.interceptor.error;
 import com.demo.poc.commons.core.errors.dto.ErrorDto;
 import com.demo.poc.commons.core.errors.exceptions.RestClientException;
 import com.demo.poc.commons.core.errors.exceptions.GenericException;
-import com.demo.poc.commons.core.logging.ThreadContextInjector;
+import com.demo.poc.commons.core.logging.ThreadContextErrorInjector;
 import com.demo.poc.commons.core.serialization.ByteSerializer;
 import com.demo.poc.commons.custom.properties.ApplicationProperties;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import java.net.ConnectException;
 public class ErrorInterceptor {
 
   private final ByteSerializer byteSerializer;
-  private final ThreadContextInjector threadContextInjector;
+  private final ThreadContextErrorInjector errorContext;
   private final ApplicationProperties properties;
 
   public Mono<Void> handleException(Throwable ex, ServerWebExchange exchange) {
@@ -57,6 +57,6 @@ public class ErrorInterceptor {
   }
 
   public void generateTrace(Throwable ex, ServerWebExchange exchange) {
-    threadContextInjector.populateFromException(ex, exchange);
+    errorContext.populateFromException(ex, exchange);
   }
 }

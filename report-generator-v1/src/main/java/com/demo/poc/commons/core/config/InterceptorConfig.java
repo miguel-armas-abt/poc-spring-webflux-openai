@@ -4,7 +4,9 @@ import com.demo.poc.commons.core.interceptor.error.ErrorInterceptor;
 import com.demo.poc.commons.core.interceptor.restclient.request.RestClientRequestInterceptor;
 import com.demo.poc.commons.core.interceptor.restclient.response.RestClientResponseInterceptor;
 import com.demo.poc.commons.core.interceptor.restserver.RestServerInterceptor;
-import com.demo.poc.commons.core.logging.ThreadContextInjector;
+import com.demo.poc.commons.core.logging.ThreadContextErrorInjector;
+import com.demo.poc.commons.core.logging.ThreadContextRestClientInjector;
+import com.demo.poc.commons.core.logging.ThreadContextRestServerInjector;
 import com.demo.poc.commons.core.serialization.ByteSerializer;
 import com.demo.poc.commons.custom.properties.ApplicationProperties;
 
@@ -16,24 +18,24 @@ public class InterceptorConfig {
 
   @Bean
   public ErrorInterceptor errorInterceptor(ByteSerializer byteSerializer,
-                                           ThreadContextInjector threadContextInjector,
+                                           ThreadContextErrorInjector context,
                                            ApplicationProperties properties) {
-    return new ErrorInterceptor(byteSerializer, threadContextInjector, properties);
+    return new ErrorInterceptor(byteSerializer, context, properties);
   }
 
   @Bean
-  public RestClientRequestInterceptor restClientRequestInterceptor(ThreadContextInjector threadContextInjector) {
-    return new RestClientRequestInterceptor(threadContextInjector);
+  public RestClientRequestInterceptor restClientRequestInterceptor(ThreadContextRestClientInjector context) {
+    return new RestClientRequestInterceptor(context);
   }
 
   @Bean
-  public RestClientResponseInterceptor restClientResponseInterceptor(ThreadContextInjector threadContextInjector) {
-    return new RestClientResponseInterceptor(threadContextInjector);
+  public RestClientResponseInterceptor restClientResponseInterceptor(ThreadContextRestClientInjector context) {
+    return new RestClientResponseInterceptor(context);
   }
 
   @Bean
-  public RestServerInterceptor restServerInterceptor(ThreadContextInjector threadContextInjector) {
-    return new RestServerInterceptor(threadContextInjector);
+  public RestServerInterceptor restServerInterceptor(ThreadContextRestServerInjector context) {
+    return new RestServerInterceptor(context);
   }
 
 }
