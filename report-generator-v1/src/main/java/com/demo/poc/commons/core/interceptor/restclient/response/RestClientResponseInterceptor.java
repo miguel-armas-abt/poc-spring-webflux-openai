@@ -1,7 +1,8 @@
 package com.demo.poc.commons.core.interceptor.restclient.response;
 
-import com.demo.poc.commons.core.logging.RestClientThreadContextInjector;
+import com.demo.poc.commons.core.logging.ThreadContextInjector;
 import com.demo.poc.commons.core.logging.dto.RestResponseLog;
+import com.demo.poc.commons.core.logging.enums.LoggingType;
 import com.demo.poc.commons.core.tracing.enums.TraceParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,7 @@ import java.util.HashMap;
 @RequiredArgsConstructor
 public class RestClientResponseInterceptor implements ExchangeFilterFunction {
 
-  private final RestClientThreadContextInjector restClientContext;
+  private final ThreadContextInjector contextInjector;
 
   @Override
   public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
@@ -45,7 +46,7 @@ public class RestClientResponseInterceptor implements ExchangeFilterFunction {
         .traceParent(request.headers().getFirst(TraceParam.TRACE_PARENT.getKey()))
         .build();
 
-    restClientContext.populateResponse(log);
+    contextInjector.populateFromRestResponse(LoggingType.REST_CLIENT_RES, log);
   }
 
 }

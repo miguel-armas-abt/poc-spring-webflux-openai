@@ -1,5 +1,6 @@
 package com.demo.poc.commons.core.restserver.utils;
 
+import com.demo.poc.commons.core.constants.Symbol;
 import com.demo.poc.commons.core.tracing.enums.TraceParam;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -38,7 +39,7 @@ public class RestServerUtils {
         .stream()
         .collect(Collectors.toMap(
             Map.Entry::getKey,
-            entry -> String.join(",", entry.getValue())
+            entry -> String.join(Symbol.COMMA, entry.getValue())
         ));
   }
 

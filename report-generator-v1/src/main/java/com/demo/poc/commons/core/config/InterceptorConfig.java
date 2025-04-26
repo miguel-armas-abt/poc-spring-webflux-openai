@@ -5,8 +5,7 @@ import com.demo.poc.commons.core.interceptor.restclient.request.RestClientReques
 import com.demo.poc.commons.core.interceptor.restclient.response.RestClientResponseInterceptor;
 import com.demo.poc.commons.core.interceptor.restserver.RestServerInterceptor;
 import com.demo.poc.commons.core.logging.ErrorThreadContextInjector;
-import com.demo.poc.commons.core.logging.RestClientThreadContextInjector;
-import com.demo.poc.commons.core.logging.RestServerThreadContextInjector;
+import com.demo.poc.commons.core.logging.ThreadContextInjector;
 import com.demo.poc.commons.core.serialization.ByteSerializer;
 import com.demo.poc.commons.custom.properties.ApplicationProperties;
 
@@ -24,18 +23,17 @@ public class InterceptorConfig {
   }
 
   @Bean
-  public RestClientRequestInterceptor restClientRequestInterceptor(RestClientThreadContextInjector context) {
+  public RestClientRequestInterceptor restClientRequestInterceptor(ThreadContextInjector context) {
     return new RestClientRequestInterceptor(context);
   }
 
   @Bean
-  public RestClientResponseInterceptor restClientResponseInterceptor(RestClientThreadContextInjector context) {
+  public RestClientResponseInterceptor restClientResponseInterceptor(ThreadContextInjector context) {
     return new RestClientResponseInterceptor(context);
   }
 
   @Bean
-  public RestServerInterceptor restServerInterceptor(RestServerThreadContextInjector context) {
+  public RestServerInterceptor restServerInterceptor(ThreadContextInjector context) {
     return new RestServerInterceptor(context);
   }
-
 }

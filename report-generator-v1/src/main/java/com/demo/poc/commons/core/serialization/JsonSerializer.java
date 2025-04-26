@@ -28,28 +28,39 @@ public class JsonSerializer {
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
   }
 
-  public <T> Mono<T> readElementFromFile(String filePath, Class<T> objectClass) {
-    return Mono.fromCallable(() -> {
-          Resource resource = new ClassPathResource(filePath);
-          try (InputStream inputStream = resource.getInputStream()) {
-            return objectMapper.readValue(inputStream, objectClass);
-          }
-        })
-        .subscribeOn(Schedulers.boundedElastic())
-        .onErrorMap(IOException.class, ex -> new JsonReadException(ex.getMessage()));
+  protected static InputStream getResourceAsStream(String filePath) throws IOException {
+    Resource resource = new ClassPathResource(filePath);
+    return resource.getInputStream();
   }
 
-  @SuppressWarnings("unchecked")
-  public <T> Flux<T> readListFromFile(String filePath, Class<T> objectClass) {
-    return Mono.fromCallable(() -> {
-          Resource resource = new ClassPathResource(filePath);
-          try (InputStream inputStream = resource.getInputStream()) {
-            CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, objectClass);
-            return (List<T>) objectMapper.readValue(inputStream, collectionType);
-          }
-        })
+  protected <T> T readValue(InputStream inputStream, Class<T> objectClass) {
+    try (InputStream is = inputStream) {
+      return objectMapper.readValue(is, objectClass);
+    } catch (IOException ex) {
+      throw new JsonReadException(ex.getMessage());
+    }
+  }
+
+  protected <T> List<T> readList(InputStream inputStream, Class<T> objectClass) {
+    try (InputStream is = inputStream) {
+      CollectionType collectionType =
+          objectMapper.getTypeFactory().constructCollectionType(List.class, objectClass);
+      return objectMapper.readValue(is, collectionType);
+    } catch (IOException ex) {
+      throw new JsonReadException(ex.getMessage());
+    }
+  }
+
+  public <T> Mono<T> readElementFromFile(String filePath, Class<T> objectClass) {
+    return Mono.fromCallable(() -> getResourceAsStream(filePath))
         .subscribeOn(Schedulers.boundedElastic())
-        .onErrorMap(IOException.class, ex -> new JsonReadException(ex.getMessage()))
+        .map(is -> readValue(is, objectClass));
+  }
+
+  public <T> Flux<T> readListFromFile(String filePath, Class<T> objectClass) {
+    return Mono.fromCallable(() -> getResourceAsStream(filePath))
+        .subscribeOn(Schedulers.boundedElastic())
+        .map(is -> readList(is, objectClass))
         .flatMapMany(Flux::fromIterable);
   }
 }

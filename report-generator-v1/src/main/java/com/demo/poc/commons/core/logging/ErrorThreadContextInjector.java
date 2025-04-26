@@ -21,6 +21,7 @@ public class ErrorThreadContextInjector {
   private final ThreadContextInjector injector;
 
   public void populateFromException(Throwable ex, ServerWebExchange exchange) {
+    ThreadContext.clearAll();
     if (ex instanceof WebClientRequestException webClientRequestException) {
       ThreadContext.put(REST_CLIENT_REQ.getCode() + METHOD, webClientRequestException.getMethod().toString());
       ThreadContext.put(REST_CLIENT_REQ.getCode() + URI, webClientRequestException.getUri().toString());
@@ -30,6 +31,5 @@ public class ErrorThreadContextInjector {
     Map<String, String> traceHeaders = TraceParam.Util.getTraceHeadersAsMap(traceParent);
     injector.populateFromHeaders(traceHeaders);
     log.error(ex.getMessage(), ex);
-    ThreadContext.clearAll();
   }
 }

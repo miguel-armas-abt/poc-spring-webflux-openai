@@ -2,9 +2,10 @@ package com.demo.poc.commons.core.interceptor.restserver;
 
 import java.util.HashMap;
 
-import com.demo.poc.commons.core.logging.RestServerThreadContextInjector;
+import com.demo.poc.commons.core.logging.ThreadContextInjector;
 import com.demo.poc.commons.core.logging.dto.RestRequestLog;
 import com.demo.poc.commons.core.logging.dto.RestResponseLog;
+import com.demo.poc.commons.core.logging.enums.LoggingType;
 import com.demo.poc.commons.core.tracing.enums.TraceParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class RestServerInterceptor implements WebFilter {
 
-  private final RestServerThreadContextInjector restServerContext;
+  private final ThreadContextInjector contextInjector;
 
   @Override
   public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
@@ -39,7 +40,7 @@ public class RestServerInterceptor implements WebFilter {
           .requestBody("ToDo")
           .traceParent(serverHttpRequest.getHeaders().getFirst(TraceParam.TRACE_PARENT.getKey()))
           .build();
-      restServerContext.populateFromRestServerRequest(log);
+      contextInjector.populateFromRestRequest(LoggingType.REST_SERVER_REQ, log);
     }
 
     private void generateTraceOfResponse(ServerHttpResponse serverHttpResponse, String uri, String traceParent) {
@@ -51,6 +52,6 @@ public class RestServerInterceptor implements WebFilter {
           .traceParent(traceParent)
           .build();
 
-      restServerContext.populateFromRestServerResponse(log);
+      contextInjector.populateFromRestResponse(LoggingType.REST_SERVER_RES, log);
     }
 }
