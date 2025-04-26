@@ -1,14 +1,12 @@
 package com.demo.poc.commons.core.tracing.enums;
 
 import java.security.SecureRandom;
-import java.util.Arrays;
 import java.util.HexFormat;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 
 import com.demo.poc.commons.core.constants.Symbol;
 import lombok.AccessLevel;
@@ -16,8 +14,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-
-import org.springframework.web.context.request.WebRequest;
 
 @Getter
 @RequiredArgsConstructor
@@ -54,21 +50,18 @@ public enum TraceParam {
       return String.format("00-%s-%s-01", traceId, newSpanId);
     };
 
-    public static Map<String, String> extractTraceHeadersAsMap(UnaryOperator<String> headerProvider) {
-      return Arrays.stream(TraceParam.values())
-          .distinct()
-          .map(TraceParam::getKey)
-          .map(headerName -> Map.entry(headerName, Optional.ofNullable(headerProvider.apply(headerName))))
-          .filter(entry -> entry.getValue().isPresent())
-          .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get()));
-    }
-
-    public static Map<String, String> extractTraceHeadersAsMap(WebRequest request) {
-      return extractTraceHeadersAsMap(request::getHeader);
-    }
-
-    public static Map<String, String> extractTraceHeadersAsMap(Map<String, String> headers) {
-      return extractTraceHeadersAsMap(headers::get);
+    public static Map<String, String> getTraceHeadersAsMap(String traceParent) {
+      return Optional.ofNullable(traceParent)
+          .map(trace -> {
+            String traceId = Util.getTraceId.apply(trace);
+            String spanId = Util.getSpanId.apply(trace);
+            return Map.of(
+                TraceParam.TRACE_PARENT.getKey(), trace,
+                TraceParam.TRACE_ID.getKey(), traceId,
+                TraceParam.SPAN_ID.getKey(), spanId
+            );
+          })
+          .orElse(Map.of());
     }
   }
 

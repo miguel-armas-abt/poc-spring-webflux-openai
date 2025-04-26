@@ -24,7 +24,7 @@ configuration:
             channelId: channelId
           auto-generated:
             timestamp: TIMESTAMP
-          trace:
+          tracing:
             traceParent: TRACE_PARENT
       performance:
         timeout: FATAL

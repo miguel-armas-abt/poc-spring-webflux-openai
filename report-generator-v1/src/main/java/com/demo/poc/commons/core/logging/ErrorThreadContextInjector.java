@@ -1,5 +1,7 @@
 package com.demo.poc.commons.core.logging;
 
+import java.util.Map;
+
 import com.demo.poc.commons.core.tracing.enums.TraceParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +16,7 @@ import static com.demo.poc.commons.core.logging.enums.LoggingType.REST_CLIENT_RE
 
 @Slf4j
 @RequiredArgsConstructor
-public class ThreadContextErrorInjector {
+public class ErrorThreadContextInjector {
 
   private final ThreadContextInjector injector;
 
@@ -24,7 +26,9 @@ public class ThreadContextErrorInjector {
       ThreadContext.put(REST_CLIENT_REQ.getCode() + URI, webClientRequestException.getUri().toString());
     }
 
-    injector.populateFromHeaders(TraceParam.Util.extractTraceHeadersAsMap(exchange.getRequest().getHeaders()::getFirst));
+    String traceParent = exchange.getRequest().getHeaders().getFirst(TraceParam.TRACE_PARENT.getKey());
+    Map<String, String> traceHeaders = TraceParam.Util.getTraceHeadersAsMap(traceParent);
+    injector.populateFromHeaders(traceHeaders);
     log.error(ex.getMessage(), ex);
     ThreadContext.clearAll();
   }

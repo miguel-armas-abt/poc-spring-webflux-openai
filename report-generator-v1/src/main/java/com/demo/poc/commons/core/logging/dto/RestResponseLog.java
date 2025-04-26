@@ -17,4 +17,5 @@ public class RestResponseLog implements Serializable {
   private String uri;
   private Map<String, String> responseHeaders;
   private String responseBody;
+  private String traceParent;
 }

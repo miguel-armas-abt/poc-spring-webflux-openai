@@ -1,9 +1,9 @@
 package com.demo.poc.commons.core.config;
 
-import com.demo.poc.commons.core.logging.ThreadContextErrorInjector;
+import com.demo.poc.commons.core.logging.ErrorThreadContextInjector;
 import com.demo.poc.commons.core.logging.ThreadContextInjector;
-import com.demo.poc.commons.core.logging.ThreadContextRestClientInjector;
-import com.demo.poc.commons.core.logging.ThreadContextRestServerInjector;
+import com.demo.poc.commons.core.logging.RestClientThreadContextInjector;
+import com.demo.poc.commons.core.logging.RestServerThreadContextInjector;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,17 +17,17 @@ public class LoggingConfig {
   }
 
   @Bean
-  public ThreadContextErrorInjector threadContextErrorInjector(ThreadContextInjector context) {
-    return new ThreadContextErrorInjector(context);
+  public ErrorThreadContextInjector threadContextErrorInjector(ThreadContextInjector context) {
+    return new ErrorThreadContextInjector(context);
   }
 
   @Bean
-  public ThreadContextRestClientInjector threadContextRestClientInjector(ThreadContextInjector context) {
-    return new ThreadContextRestClientInjector(context);
+  public RestClientThreadContextInjector threadContextRestClientInjector(ThreadContextInjector context) {
+    return new RestClientThreadContextInjector(context);
   }
 
   @Bean
-  public ThreadContextRestServerInjector threadContextRestServerInjector(ThreadContextInjector context) {
-    return new ThreadContextRestServerInjector(context);
+  public RestServerThreadContextInjector threadContextRestServerInjector(ThreadContextInjector context) {
+    return new RestServerThreadContextInjector(context);
   }
 }

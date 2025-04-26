@@ -11,7 +11,7 @@ import static com.demo.poc.commons.core.logging.enums.LoggingType.REST_CLIENT_RE
 
 @Slf4j
 @RequiredArgsConstructor
-public class ThreadContextRestClientInjector {
+public class RestClientThreadContextInjector {
 
   private final ThreadContextInjector injector;
 

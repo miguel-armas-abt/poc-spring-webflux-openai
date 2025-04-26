@@ -1,6 +1,6 @@
 package com.demo.poc.commons.core.interceptor.restclient.response;
 
-import com.demo.poc.commons.core.logging.ThreadContextRestClientInjector;
+import com.demo.poc.commons.core.logging.RestClientThreadContextInjector;
 import com.demo.poc.commons.core.logging.dto.RestResponseLog;
 import com.demo.poc.commons.core.tracing.enums.TraceParam;
 import lombok.RequiredArgsConstructor;
@@ -14,13 +14,12 @@ import org.springframework.web.reactive.function.client.ExchangeFunction;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
 public class RestClientResponseInterceptor implements ExchangeFilterFunction {
 
-  private final ThreadContextRestClientInjector restClientContext;
+  private final RestClientThreadContextInjector restClientContext;
 
   @Override
   public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
@@ -38,14 +37,12 @@ public class RestClientResponseInterceptor implements ExchangeFilterFunction {
   }
 
   private void generateTrace(ClientRequest request, ClientResponse response, String responseBody) {
-    Map<String,String> responseHeaders = new HashMap<>(response.headers().asHttpHeaders().toSingleValueMap());
-    responseHeaders.put(TraceParam.TRACE_PARENT.getKey(), request.headers().getFirst(TraceParam.TRACE_PARENT.getKey()));
-
     RestResponseLog log = RestResponseLog.builder()
         .uri(request.url().toString())
         .responseBody(responseBody)
-        .responseHeaders(responseHeaders)
+        .responseHeaders(new HashMap<>(response.headers().asHttpHeaders().toSingleValueMap()))
         .httpCode(String.valueOf(response.statusCode().value()))
+        .traceParent(request.headers().getFirst(TraceParam.TRACE_PARENT.getKey()))
         .build();
 
     restClientContext.populateResponse(log);

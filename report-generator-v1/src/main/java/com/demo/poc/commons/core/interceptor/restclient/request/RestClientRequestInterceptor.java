@@ -1,7 +1,8 @@
 package com.demo.poc.commons.core.interceptor.restclient.request;
 
-import com.demo.poc.commons.core.logging.ThreadContextRestClientInjector;
+import com.demo.poc.commons.core.logging.RestClientThreadContextInjector;
 import com.demo.poc.commons.core.logging.dto.RestRequestLog;
+import com.demo.poc.commons.core.tracing.enums.TraceParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
@@ -24,7 +25,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 @RequiredArgsConstructor
 public class RestClientRequestInterceptor implements ExchangeFilterFunction {
 
-  private final ThreadContextRestClientInjector restClientContext;
+  private final RestClientThreadContextInjector restClientContext;
 
   @Override
   public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
@@ -73,6 +74,7 @@ public class RestClientRequestInterceptor implements ExchangeFilterFunction {
         .uri(clientRequest.url().toString())
         .requestHeaders(clientRequest.headers().toSingleValueMap())
         .requestBody(requestBody)
+        .traceParent(clientRequest.headers().getFirst(TraceParam.TRACE_PARENT.getKey()))
         .build();
 
     restClientContext.populateRequest(log);

@@ -28,7 +28,7 @@ public class ThreadContextInjector {
   }
 
   public void populateFromRestRequest(LoggingType loggingType, RestRequestLog restRequestLog) {
-    Map<String, String> traceHeaders = TraceParam.Util.extractTraceHeadersAsMap(restRequestLog.getRequestHeaders()::get);
+    Map<String, String> traceHeaders = TraceParam.Util.getTraceHeadersAsMap(restRequestLog.getTraceParent());
     populateFromHeaders(traceHeaders);
     putInContext(loggingType.getCode() + RestConstants.METHOD, restRequestLog.getMethod());
     putInContext(loggingType.getCode() + RestConstants.URI, restRequestLog.getUri());
@@ -37,7 +37,7 @@ public class ThreadContextInjector {
   }
 
   public void populateFromRestResponse(LoggingType loggingType, RestResponseLog restResponseLog) {
-    Map<String, String> traceHeaders = TraceParam.Util.extractTraceHeadersAsMap(restResponseLog.getResponseHeaders()::get);
+    Map<String, String> traceHeaders = TraceParam.Util.getTraceHeadersAsMap(restResponseLog.getTraceParent());
     populateFromHeaders(traceHeaders);
     putInContext(loggingType.getCode() + RestConstants.HEADERS, Utils.getHeadersAsString(restResponseLog.getResponseHeaders()));
     putInContext(loggingType.getCode() + RestConstants.URI, restResponseLog.getUri());

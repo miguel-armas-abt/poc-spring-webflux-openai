@@ -16,4 +16,5 @@ public class RestRequestLog implements Serializable {
   private String uri;
   private Map<String, String> requestHeaders;
   private String requestBody;
+  private String traceParent;
 }
