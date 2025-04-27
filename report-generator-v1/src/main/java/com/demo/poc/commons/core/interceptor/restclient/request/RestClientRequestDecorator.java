@@ -22,13 +22,16 @@ public class RestClientRequestDecorator extends ClientHttpRequestDecorator {
 
   private final ThreadContextInjector contextInjector;
   private final ClientRequest originalRequest;
+  private final boolean isLoggerPresent;
 
   public RestClientRequestDecorator(ClientHttpRequest delegate,
                                     ThreadContextInjector contextInjector,
-                                    ClientRequest originalRequest) {
+                                    ClientRequest originalRequest,
+                                    boolean isLoggerPresent) {
     super(delegate);
     this.contextInjector = contextInjector;
     this.originalRequest = originalRequest;
+    this.isLoggerPresent = isLoggerPresent;
   }
 
   @Override
@@ -38,7 +41,7 @@ public class RestClientRequestDecorator extends ClientHttpRequestDecorator {
         .flatMap(buffer -> {
           try {
             String payload = buffer.toString(StandardCharsets.UTF_8);
-            trace(payload);
+            generateTrace(payload);
             DataBuffer copy = buffer.factory().wrap(buffer.asByteBuffer());
             return super.writeWith(Mono.just(copy));
           } finally {
@@ -49,24 +52,25 @@ public class RestClientRequestDecorator extends ClientHttpRequestDecorator {
 
   @Override
   public Mono<Void> setComplete() {
-    trace(StringUtils.EMPTY);
+    generateTrace(StringUtils.EMPTY);
     return super.setComplete();
   }
 
-  private void trace(String payload) {
-    Mono.fromRunnable(() -> {
-          RestRequestLog log = RestRequestLog.builder()
-              .method(originalRequest.method().name())
-              .uri(originalRequest.url().toString())
-              .requestHeaders(originalRequest.headers().toSingleValueMap())
-              .requestBody(payload)
-              .traceParent(originalRequest.headers().getFirst(TraceParam.TRACE_PARENT.getKey()))
-              .build();
-          contextInjector.populateFromRestRequest(LoggingType.REST_CLIENT_REQ, log);
-        })
-        .subscribeOn(Schedulers.boundedElastic())
-        .subscribe();
-
+  private void generateTrace(String payload) {
+    if (isLoggerPresent) {
+      Mono.fromRunnable(() -> {
+            RestRequestLog log = RestRequestLog.builder()
+                .method(originalRequest.method().name())
+                .uri(originalRequest.url().toString())
+                .requestHeaders(originalRequest.headers().toSingleValueMap())
+                .requestBody(payload)
+                .traceParent(originalRequest.headers().getFirst(TraceParam.TRACE_PARENT.getKey()))
+                .build();
+            contextInjector.populateFromRestRequest(LoggingType.REST_CLIENT_REQ, log);
+          })
+          .subscribeOn(Schedulers.boundedElastic())
+          .subscribe();
+    }
   }
 
 }

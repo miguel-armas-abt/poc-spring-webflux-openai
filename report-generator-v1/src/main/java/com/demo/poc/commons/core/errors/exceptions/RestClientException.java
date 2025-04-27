@@ -1,6 +1,7 @@
 package com.demo.poc.commons.core.errors.exceptions;
 
 import com.demo.poc.commons.core.errors.dto.ErrorDto;
+import com.demo.poc.commons.core.errors.dto.ErrorType;
 import lombok.Getter;
 import org.springframework.http.HttpStatusCode;
 
@@ -15,9 +16,10 @@ public class RestClientException extends RuntimeException {
   private final ErrorDto errorDetail;
   private final HttpStatusCode httpStatusCode;
 
-  public RestClientException(String code, String message, HttpStatusCode httpStatusCode) {
+  public RestClientException(String code, String message, ErrorType errorType, HttpStatusCode httpStatusCode) {
     super(message);
     this.errorDetail = ErrorDto.builder()
+        .type(errorType)
         .code(code)
         .message(message)
         .build();

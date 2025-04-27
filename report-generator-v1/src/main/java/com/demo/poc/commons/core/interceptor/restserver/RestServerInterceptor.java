@@ -7,6 +7,7 @@ import com.demo.poc.commons.core.logging.dto.RestRequestLog;
 import com.demo.poc.commons.core.logging.dto.RestResponseLog;
 import com.demo.poc.commons.core.logging.enums.LoggingType;
 import com.demo.poc.commons.core.tracing.enums.TraceParam;
+import com.demo.poc.commons.custom.properties.ApplicationProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -21,6 +22,7 @@ import reactor.core.publisher.Mono;
 public class RestServerInterceptor implements WebFilter {
 
   private final ThreadContextInjector contextInjector;
+  private final ApplicationProperties properties;
 
   @Override
   public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
@@ -28,11 +30,14 @@ public class RestServerInterceptor implements WebFilter {
     String traceParent = exchange.getRequest().getHeaders().getFirst(TraceParam.TRACE_PARENT.getKey());
 
     generateTraceOfRequest(exchange.getRequest());
+
     return chain.filter(exchange)
         .doOnSuccess(ignore -> generateTraceOfResponse(exchange.getResponse(), uri, traceParent));
-    }
+  }
 
-    private void generateTraceOfRequest(ServerHttpRequest serverHttpRequest) {
+  private void generateTraceOfRequest(ServerHttpRequest serverHttpRequest) {
+    boolean isLoggerRequestPresent = properties.isLoggerPresent(LoggingType.REST_SERVER_REQ);
+    if(isLoggerRequestPresent) {
       RestRequestLog log = RestRequestLog.builder()
           .uri(serverHttpRequest.getURI().toString())
           .method(serverHttpRequest.getMethod().toString())
@@ -42,8 +47,11 @@ public class RestServerInterceptor implements WebFilter {
           .build();
       contextInjector.populateFromRestRequest(LoggingType.REST_SERVER_REQ, log);
     }
+  }
 
-    private void generateTraceOfResponse(ServerHttpResponse serverHttpResponse, String uri, String traceParent) {
+  private void generateTraceOfResponse(ServerHttpResponse serverHttpResponse, String uri, String traceParent) {
+    boolean isLoggerResponsePresent = properties.isLoggerPresent(LoggingType.REST_SERVER_RES);
+    if(isLoggerResponsePresent) {
       RestResponseLog log = RestResponseLog.builder()
           .uri(uri)
           .responseHeaders(new HashMap<>(serverHttpResponse.getHeaders().toSingleValueMap()))
@@ -54,4 +62,5 @@ public class RestServerInterceptor implements WebFilter {
 
       contextInjector.populateFromRestResponse(LoggingType.REST_SERVER_RES, log);
     }
+  }
 }

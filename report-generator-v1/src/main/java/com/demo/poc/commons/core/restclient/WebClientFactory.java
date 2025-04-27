@@ -3,6 +3,7 @@ package com.demo.poc.commons.core.restclient;
 import com.demo.poc.commons.core.errors.exceptions.UnexpectedSslException;
 import com.demo.poc.commons.core.properties.restclient.PerformanceTemplate;
 import com.demo.poc.commons.core.restclient.enums.ConcurrencyLevel;
+import io.micrometer.observation.ObservationRegistry;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
@@ -29,6 +30,7 @@ import static io.netty.handler.ssl.util.InsecureTrustManagerFactory.INSTANCE;
 public class WebClientFactory {
 
   private final List<ExchangeFilterFunction> filters;
+  private final ObservationRegistry observationRegistry;
 
   public WebClient createWebClient(PerformanceTemplate performance, String restClientName) {
     try {
@@ -36,6 +38,7 @@ public class WebClientFactory {
       return WebClient.builder()
           .clientConnector(new ReactorClientHttpConnector(httpClient))
           .filters(extraFilters -> extraFilters.addAll(filters))
+          .observationRegistry(observationRegistry)
           .observationConvention(new DefaultClientRequestObservationConvention())
           .build();
     } catch (SSLException ex) {

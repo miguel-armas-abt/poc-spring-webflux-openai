@@ -2,18 +2,15 @@ package com.demo.poc.entrypoint.report.repository.openai;
 
 import java.util.Map;
 
-import com.demo.poc.commons.core.errors.dto.ErrorDto;
-import com.demo.poc.commons.core.errors.exceptions.RestClientException;
 import com.demo.poc.commons.core.properties.restclient.RestClient;
 import com.demo.poc.commons.core.restclient.WebClientFactory;
+import com.demo.poc.commons.core.restclient.error.RestClientErrorHandler;
 import com.demo.poc.commons.custom.properties.ApplicationProperties;
 import com.demo.poc.entrypoint.report.repository.openai.config.OpenAIProperties;
+import com.demo.poc.entrypoint.report.repository.openai.error.OpenAIError;
 import com.demo.poc.entrypoint.report.repository.openai.mapper.OpenAIRequestMapper;
 import com.demo.poc.entrypoint.report.repository.openai.wrapper.response.ChatResponseWrapper;
 import com.demo.poc.entrypoint.report.utils.ImageSerializer;
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 
 import org.springframework.http.HttpEntity;
@@ -28,23 +25,27 @@ import org.springframework.web.reactive.function.client.WebClient;
 import static com.demo.poc.commons.core.restclient.utils.HttpHeadersFiller.fillHeaders;
 
 @Repository
-@RequiredArgsConstructor
 public class OpenAIRepository {
 
   private static final String SERVICE_NAME = "openai-completion";
 
-  private final ApplicationProperties appProperties;
-  private final OpenAIProperties openAIProperties;
-  private final WebClientFactory webClientFactory;
+  private final RestClientErrorHandler errorHandler;
+  private final WebClient webClient;
+  private final RestClient restClient;
   private final OpenAIRequestMapper openAIMapper;
+  private final OpenAIProperties openAIProperties;
 
-  private WebClient webClient;
-  private RestClient restClient;
+  public OpenAIRepository(ApplicationProperties properties,
+                          RestClientErrorHandler errorHandler,
+                          WebClientFactory webClientFactory,
+                          OpenAIRequestMapper openAIMapper,
+                          OpenAIProperties openAIProperties) {
+    this.errorHandler = errorHandler;
+    this.openAIMapper = openAIMapper;
+    this.openAIProperties = openAIProperties;
 
-  @PostConstruct
-  public void init() {
-    this.restClient = appProperties.searchRestClient(SERVICE_NAME);
-    this.webClient = webClientFactory.createWebClient(this.restClient.getPerformance(), SERVICE_NAME);
+    this.restClient = properties.searchRestClient(SERVICE_NAME);
+    this.webClient = webClientFactory.createWebClient(restClient.getPerformance(), SERVICE_NAME);
   }
 
   public Mono<ChatResponseWrapper> analyzeImage(Map<String, String> headers,
@@ -77,10 +78,7 @@ public class OpenAIRepository {
   }
 
   private Mono<? extends Throwable> handleError(ClientResponse clientResponse) {
-    return clientResponse.bodyToMono(String.class)
-        .flatMap(jsonBody -> StringUtils.EMPTY.equals(jsonBody)
-            ? Mono.error(new RestClientException(ErrorDto.CODE_DEFAULT, "Unexpected", HttpStatusCode.valueOf(409)))
-            : Mono.error(new RestClientException(ErrorDto.CODE_DEFAULT, jsonBody, clientResponse.statusCode())));
+    return errorHandler.handleError(clientResponse, OpenAIError.class, SERVICE_NAME);
   }
 
 }

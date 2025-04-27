@@ -1,9 +1,9 @@
 package com.demo.poc.commons.core.properties.restclient;
 
-import java.util.Map;
-
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Map;
 
 @Getter
 @Setter

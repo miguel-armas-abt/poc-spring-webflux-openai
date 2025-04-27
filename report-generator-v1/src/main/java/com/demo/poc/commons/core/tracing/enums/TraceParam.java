@@ -4,6 +4,7 @@ import java.security.SecureRandom;
 import java.util.HexFormat;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -55,11 +56,12 @@ public enum TraceParam {
           .map(trace -> {
             String traceId = Util.getTraceId.apply(trace);
             String spanId = Util.getSpanId.apply(trace);
-            return Map.of(
-                TraceParam.TRACE_PARENT.getKey(), trace,
-                TraceParam.TRACE_ID.getKey(), traceId,
-                TraceParam.SPAN_ID.getKey(), spanId
-            );
+            Map<String, String> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+            headers.put(TraceParam.TRACE_PARENT.getKey(), trace);
+            headers.put(TraceParam.TRACE_ID.getKey(), traceId);
+            headers.put(TraceParam.SPAN_ID.getKey(), spanId);
+
+            return headers;
           })
           .orElse(Map.of());
     }

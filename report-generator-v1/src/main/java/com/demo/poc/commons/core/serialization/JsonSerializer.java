@@ -4,8 +4,6 @@ import com.demo.poc.commons.core.errors.exceptions.JsonReadException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -16,16 +14,16 @@ import reactor.core.scheduler.Schedulers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
-@RequiredArgsConstructor
 public class JsonSerializer {
 
   private final ObjectMapper objectMapper;
 
-  @PostConstruct
-  private void configureObjectMapper() {
-    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
+  public JsonSerializer(ObjectMapper objectMapper) {
+    this.objectMapper = objectMapper;
+    this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
   }
 
   protected static InputStream getResourceAsStream(String filePath) throws IOException {
@@ -62,5 +60,14 @@ public class JsonSerializer {
         .subscribeOn(Schedulers.boundedElastic())
         .map(is -> readList(is, objectClass))
         .flatMapMany(Flux::fromIterable);
+  }
+
+  public <T> Optional<T> readNullableObject(String jsonBody, Class<T> objectClass) {
+    try {
+      return Optional.ofNullable(objectMapper.readValue(jsonBody, objectClass));
+    } catch (IOException ex) {
+      log.warn("Json parsing error: {}", ex.getMessage());
+      return Optional.empty();
+    }
   }
 }
