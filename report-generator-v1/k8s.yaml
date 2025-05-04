@@ -1,0 +1,110 @@
+---
+# Source: generic-backend-chart/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: report-generator-v1-secret
+type: Opaque
+data:
+  OPENAI_KEY: "ZHVtbXktb3BlbmFpLWtleQ=="
+---
+# Source: generic-backend-chart/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: report-generator-v1-config-map
+data:
+    JAVA_OPTS: "-Xms256M -Xmx256M"
+    MAX_TOKENS: "700"
+    TEMPERATURE: "0.7"
+---
+# Source: generic-backend-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: report-generator-v1
+  labels:
+    app: report-generator-v1
+spec:
+  type: NodePort
+  selector:
+    app: report-generator-v1
+  ipFamilies:
+    - IPv4
+  ports:
+    - name: report-generator-v1
+      port: 8080
+      nodePort: 30080
+---
+# Source: generic-backend-chart/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: report-generator-v1
+  labels:
+    app: report-generator-v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: report-generator-v1
+  template:
+    metadata:
+      labels:
+        app: report-generator-v1
+    spec:
+      containers:
+        - name: report-generator-v1
+          image: "miguelarmasabt/report-generator:v1.0.1"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "500m"
+            limits:
+              memory: "512Mi"
+              cpu: "1"
+
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 30
+
+          env:
+              - name: JAVA_OPTS
+                valueFrom:
+                  configMapKeyRef:
+                    name: report-generator-v1-config-map
+                    key: JAVA_OPTS
+
+              - name: MAX_TOKENS
+                valueFrom:
+                  configMapKeyRef:
+                    name: report-generator-v1-config-map
+                    key: MAX_TOKENS
+
+              - name: TEMPERATURE
+                valueFrom:
+                  configMapKeyRef:
+                    name: report-generator-v1-config-map
+                    key: TEMPERATURE
+
+              - name: OPENAI_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: report-generator-v1-secret
+                    key: OPENAI_KEY

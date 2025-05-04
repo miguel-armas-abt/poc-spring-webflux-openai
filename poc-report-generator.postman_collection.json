@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "a971f84f-263e-4a46-872a-ad33429782c8",
+		"_postman_id": "0e03cd79-e563-411d-8928-6e67f24d1ae8",
 		"name": "poc-report-generator",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "33527392"
+		"_exporter_id": "13773998"
 	},
 	"item": [
 		{
@@ -45,17 +45,17 @@
 						{
 							"key": "form-image",
 							"type": "file",
-							"src": "/D:/dev-workspace/_personal/poc-webflux-openai/report-generator-v1/src/main/resources/img/form-image.jpg"
+							"src": "/C:/dev-workspace/poc-webflux-openai/report-generator-v1/src/main/resources/img/form-image.jpg"
 						}
 					]
 				},
 				"url": {
-					"raw": "http://localhost:8018/poc/report-generator/v1/reports",
+					"raw": "http://localhost:8080/poc/report-generator/v1/reports",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8018",
+					"port": "8080",
 					"path": [
 						"poc",
 						"report-generator",
