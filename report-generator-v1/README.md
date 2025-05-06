@@ -2,6 +2,11 @@
 [← Regresar](../README.md) <br>
 
 ---
+## 📋 Core library
+[🌐 Documentación](https://github.com/miguel-armas-abt/backend-core-library) <br>
+[🏷️ Versión](./src/main/java/com/demo/poc/commons/core/package-info.java) <br>
+
+---
 
 ## ▶️ Despliegue local
 
@@ -60,7 +65,3 @@ kubectl delete -f ./k8s.yaml -n reports
 ```shell
 kubectl port-forward <pod-id> 8080:8080 -n reports
 ```
-
----
-
-[📦 core-library](./src/main/java/com/demo/poc/commons/core/package-info.java)
