@@ -35,8 +35,7 @@ public enum ErrorDictionary {
 
   //business and bad requests: 01.02.xx
   INVALID_FIELD("01.02.01", "Invalid field", BAD_REQUEST, InvalidFieldException.class),
-  ERROR_READING_DOCX("01.01.01", "Error reading DOCX", INTERNAL_SERVER_ERROR, DocxReadException.class),
-  FORM_IMAGE_IS_REQUIRED("01.01.02", "Form image is required", BAD_REQUEST, FormImageIsRequiredException.class),;
+  ERROR_READING_DOCX("01.01.01", "Error reading DOCX", INTERNAL_SERVER_ERROR, DocxReadException.class),;
 
   private final String code;
   private final String message;

@@ -22,12 +22,12 @@ public interface OpenAIRequestMapper {
   @Mapping(target = "messages", source = "prompt", qualifiedByName = "buildAnalyzeTextMessage")
   ChatRequestWrapper toAnalyzeTextRequest(Integer maxTokens, Double temperature, String prompt);
 
-  default ChatRequestWrapper toAnalyzeImageRequest(Integer maxTokens, Double temperature, String prompt, String imageInBase64) {
+  default ChatRequestWrapper toAnalyzeImageRequest(Integer maxTokens, Double temperature, String prompt, String imageUrl) {
     return ChatRequestWrapper.builder()
         .model(ModelType.GPT_4_1_MINI.getLabel())
         .maxTokens(maxTokens)
         .temperature(temperature)
-        .messages(buildAnalyzeImageMessage(prompt, imageInBase64))
+        .messages(buildAnalyzeImageMessage(prompt, imageUrl))
         .build();
   }
 
@@ -46,7 +46,7 @@ public interface OpenAIRequestMapper {
     );
   }
 
-  private List<MessageRequest> buildAnalyzeImageMessage(String prompt, String imageInBase64) {
+  private List<MessageRequest> buildAnalyzeImageMessage(String prompt, String imageUrl) {
     return List.of(
         MessageRequest.builder()
             .role(RoleType.USER.getLabel())
@@ -58,7 +58,7 @@ public interface OpenAIRequestMapper {
                 ContentRequest.builder()
                     .type(ContentType.IMAGE.getLabel())
                     .imageUrl(ImageUrlRequest.builder()
-                        .url("data:image/jpeg;base64," + imageInBase64)
+                        .url(imageUrl)
                         .build())
                     .build()
             ))

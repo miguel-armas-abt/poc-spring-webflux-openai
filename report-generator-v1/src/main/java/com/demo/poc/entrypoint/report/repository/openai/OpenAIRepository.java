@@ -9,14 +9,13 @@ import com.demo.poc.commons.custom.properties.ApplicationProperties;
 import com.demo.poc.entrypoint.report.repository.openai.config.OpenAIProperties;
 import com.demo.poc.entrypoint.report.repository.openai.error.OpenAIError;
 import com.demo.poc.entrypoint.report.repository.openai.mapper.OpenAIRequestMapper;
+import com.demo.poc.entrypoint.report.repository.openai.wrapper.request.ChatRequestWrapper;
 import com.demo.poc.entrypoint.report.repository.openai.wrapper.response.ChatResponseWrapper;
-import com.demo.poc.entrypoint.report.utils.ImageSerializer;
 import reactor.core.publisher.Mono;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
-import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -50,10 +49,9 @@ public class OpenAIRepository {
 
   public Mono<ChatResponseWrapper> analyzeImage(Map<String, String> headers,
                                                 String prompt,
-                                                FilePart imageFile) {
-    return ImageSerializer.serializeImageAndGetBase64(imageFile)
-        .map(imageInBase64 -> openAIMapper.toAnalyzeImageRequest(openAIProperties.getMaxTokens(), openAIProperties.getTemperature(), prompt, imageInBase64))
-        .flatMap(request -> webClient.post()
+                                                String imageUrl) {
+    ChatRequestWrapper request = openAIMapper.toAnalyzeImageRequest(openAIProperties.getMaxTokens(), openAIProperties.getTemperature(), prompt, imageUrl);
+    return webClient.post()
         .uri(this.restClient.getRequest().getEndpoint())
         .headers(x -> fillHeaders(this.restClient.getRequest().getHeaders(), headers).accept(x))
         .contentType(MediaType.APPLICATION_JSON)
@@ -61,7 +59,7 @@ public class OpenAIRepository {
         .retrieve()
         .onStatus(HttpStatusCode::isError, this::handleError)
         .toEntity(ChatResponseWrapper.class)
-        .mapNotNull(HttpEntity::getBody));
+        .mapNotNull(HttpEntity::getBody);
   }
 
   public Mono<ChatResponseWrapper> analyzeText(Map<String, String> headers,
