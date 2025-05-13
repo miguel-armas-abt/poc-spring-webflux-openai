@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "0e03cd79-e563-411d-8928-6e67f24d1ae8",
+		"_postman_id": "a971f84f-263e-4a46-872a-ad33429782c8",
 		"name": "poc-report-generator",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "13773998"
+		"_exporter_id": "33527392"
 	},
 	"item": [
 		{
@@ -40,14 +40,13 @@
 					}
 				],
 				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "form-image",
-							"type": "file",
-							"src": "/C:/dev-workspace/poc-webflux-openai/report-generator-v1/src/main/resources/img/form-image.jpg"
+					"mode": "raw",
+					"raw": "{\r\n    \"imageUrl\": \"https://raw.githubusercontent.com/miguel-armas-abt/poc-spring-webflux-openai/main/report-generator-v1/src/main/resources/img/form-image.jpeg\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
 						}
-					]
+					}
 				},
 				"url": {
 					"raw": "http://localhost:8080/poc/report-generator/v1/reports",
@@ -63,6 +62,47 @@
 						"reports"
 					]
 				}
+			},
+			"response": []
+		},
+		{
+			"name": "openai - completions",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{OPENAI_KEY}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"model\": \"gpt-4o-mini\",\r\n    \"messages\": [\r\n        {\r\n            \"role\": \"system\",\r\n            \"content\": \"Eres un asistente útil.\"\r\n        },\r\n        {\r\n            \"role\": \"user\",\r\n            \"content\": \"¡Hola, mundo!\"\r\n        }\r\n    ],\r\n    \"max_tokens\": 40,\r\n    \"temperature\": 0.7\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.openai.com/v1/chat/completions",
+					"protocol": "https",
+					"host": [
+						"api",
+						"openai",
+						"com"
+					],
+					"path": [
+						"v1",
+						"chat",
+						"completions"
+					]
+				},
+				"description": "Generated from cURL: curl https://api.openai.com/v1/chat/completions \\\r\n  -H \"Content-Type: application/json\" \\\r\n  -H \"Authorization: Bearer $OPENAI_API_KEY\" \\\r\n  -d '{\r\n    \"model\": \"gpt-4o-mini\",\r\n    \"messages\": [\r\n      {\"role\": \"system\", \"content\": \"Eres un asistente útil.\"},\r\n      {\"role\": \"user\",   \"content\": \"¡Hola, mundo!\"}\r\n    ],\r\n    \"max_tokens\": 150,\r\n    \"temperature\": 0.7\r\n  }'\r\n"
 			},
 			"response": []
 		}
